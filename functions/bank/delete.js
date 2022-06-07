@@ -7,44 +7,30 @@ const prisma = new PrismaClient()
  */
 exports.handler = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
-  /**
-  * @type {{
-   *  active: boolean
-   *  superUser: boolean
-   *  userId: string,
-   *  name: string,
-   *  password: string,
-   *  email: string
-   *  rg: string
-   *  cpf: string
-   *  permissionLevel: number
-   *  sexo: string
-   * }}
- */
 
   const body = JSON.parse(event.body)
   const id = event.pathParameters.id
   try {
-    const user = await prisma.user.findFirst({
-      where: { userId: id }
+    const bankBranch = await prisma.bankBranch.findFirst({
+      where: { agencyId: id }
     })
-    if (!user) {
+    if (!bankBranch) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: 'User doenst exist'
+          message: 'bankBranch doenst exist'
         })
       }
     }
 
-    await prisma.user.deleteMany({
-      where: {userId: id}
+    await prisma.bankBranch.deleteMany({
+      where: {agencyId: id}
     })
     return {
       statusCode: 201,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(`User: ${user.name} deleted`)
+      body: JSON.stringify(`Bank: ${bankBranch.agencyId} deleted`)
     }
   } catch (error) {
     console.error(error)

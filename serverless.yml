@@ -26,6 +26,7 @@ functions:
       - http:
           method: GET
           path: /seed
+          cors: true
 
   login:
     handler: functions/auth/login.handler
@@ -33,6 +34,7 @@ functions:
       - http:
           method: POST
           path: /login
+          cors: true
 
   getUsers:
     handler: functions/user/list.handler
@@ -48,18 +50,56 @@ functions:
       - http:
           method: POST
           path: /users
+          cors: true
   updateUser:
     handler: functions/user/update.handler
     events:
       - http:
           method: PUT
           path: /users/{id}
+          authorizer: authorize
+          cors: true
   deleteUser:
     handler: functions/user/delete.handler
     events:
       - http:
           method: DELETE
           path: /users/{id}
+          authorizer: authorize
+          cors: true
+
+  createBank:
+    handler: functions/bank/create.handler
+    events:
+      - http:
+          method: POST
+          path: /bank
+          authorizer: authorize
+          cors: true
+  listBank:
+    handler: functions/bank/list.handler
+    events:
+      - http:
+          method: GET
+          path: /bank
+          authorizer: authorize
+          cors: true
+  getBankById:
+    handler: functions/bank/getById.handler
+    events:
+      - http:
+          method: GET
+          path: /bank/{id}
+          authorizer: authorize
+          cors: true
+  deleteBank:
+    handler: functions/bank/delete.handler
+    events:
+      - http:
+          method: DELETE
+          path: /bank/{id}
+          authorizer: authorize
+          cors: true
 
 # only include the Prisma binary required on AWS Lambda while packaging
 package:
