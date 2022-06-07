@@ -1,0 +1,70 @@
+service: prisma-aws-lambda-example
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs14.x
+  timeout: 10
+
+functions:
+
+  authorize:
+    handler: functions/authorize.handler
+
+  status:
+    handler: functions/status.handler
+    events:
+      - http:
+          method: GET
+          path: /
+  seed:
+    handler: functions/seed.handler
+    events:
+      - http:
+          method: GET
+          path: /seed
+
+  login:
+    handler: functions/auth/login.handler
+    events:
+      - http:
+          method: POST
+          path: /login
+
+  getUsers:
+    handler: functions/user/list.handler
+    events:
+      - http:
+          method: GET
+          path: /users
+          authorizer: authorize
+          cors: true
+  createUser:
+    handler: functions/user/create-user.handler
+    events:
+      - http:
+          method: POST
+          path: /users
+  updateUser:
+    handler: functions/user/update.handler
+    events:
+      - http:
+          method: PUT
+          path: /users/{id}
+  deleteUser:
+    handler: functions/user/delete.handler
+    events:
+      - http:
+          method: DELETE
+          path: /users/{id}
+
+# only include the Prisma binary required on AWS Lambda while packaging
+package:
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+    - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'

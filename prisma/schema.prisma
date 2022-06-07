@@ -1,0 +1,98 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int     @id @default(autoincrement())
+  active          Boolean @default(true)
+  userId          String  @unique @default(uuid())
+  name            String
+  email           String  @unique
+  password        String
+  superUser       Boolean @default(false)
+  rg              String
+  cpf             String
+  sexo            String?
+  refreshToken    String?
+  permissionLevel Int
+  Permissions Permission   @relation(fields: [permissionLevel], references: [permissionLevel])
+  Account     Account[]
+  CreditCard  CreditCard[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId, name, id])
+  @@map("users")
+}
+
+model Permission {
+  id              Int    @id @default(autoincrement())
+  permissionName  String @unique
+  permissionLevel Int    @unique
+  User User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([permissionLevel, permissionName])
+  @@map("permissions")
+}
+
+model BankBranch {
+  id           Int     @id @default(autoincrement())
+  active       Boolean @default(true)
+  BankName     String  @default("OurBank")
+  bankBranchId String  @unique @default(uuid())
+  agencyId     Int     @unique
+  Account    Account[]
+  CreditCard CreditCard[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([bankBranchId, agencyId])
+  @@map("brankBranch")
+}
+
+model Account {
+  id                 Int     @id @default(autoincrement())
+  active             Boolean @default(false)
+  accountId          String  @unique @default(uuid())
+  user_id            Int
+  typeAccount        String
+  agency_number      Int
+  account_number     Int     @unique
+  limit_acount_money Float   @default(0)
+  account_money      Float   @default(0)
+  CreditCard CreditCard[]
+  User       User         @relation(fields: [user_id], references: [id])
+  BankBranch BankBranch   @relation(fields: [agency_number], references: [agencyId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([accountId, user_id, account_number])
+  @@map("accounts")
+}
+
+model CreditCard {
+  id                 Int      @id @default(autoincrement())
+  active             Boolean  @default(false)
+  creditCardId       String   @unique @default(uuid())
+  cardNameUser       String
+  flag               String
+  cardNumber         String
+  cardValidity       DateTime @db.Date
+  cardSecurityNumber Int
+  user_acc           Int
+  limit_card         Float    @default(0)
+  limit_card_used    Float    @default(0)
+  agency_id          Int
+  account_user       Int
+  User       User       @relation(fields: [user_acc], references: [id])
+  BankBranch BankBranch @relation(fields: [agency_id], references: [agencyId])
+  Account    Account    @relation(fields: [account_user], references: [account_number])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([creditCardId, cardNameUser, cardNumber])
+  @@map("creditCards")
+}
