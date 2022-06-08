@@ -3,6 +3,7 @@ const {
   PrismaClient
 } = require('@prisma/client')
 const prisma = new PrismaClient()
+const authorizer = require('../authorization')
 
 /**
  * @function
@@ -21,6 +22,13 @@ exports.handler = async (event, context, callback) => {
     */
 
     const data = JSON.parse(event.body)
+    const permission = await authorizer(event, 2)
+    if (permission === false) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify('User doenst have permission')
+      }
+    }
     const createBank = await prisma.bankBranch.create({ data })
 
     return {

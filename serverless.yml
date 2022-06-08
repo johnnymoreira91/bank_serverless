@@ -44,6 +44,14 @@ functions:
           path: /users
           authorizer: authorize
           cors: true
+  getUserById:
+    handler: functions/user/getById.handler
+    events:
+      - http:
+          method: GET
+          path: /users/{id}
+          authorizer: authorize
+          cors: true       
   createUser:
     handler: functions/user/create-user.handler
     events:
@@ -98,6 +106,23 @@ functions:
       - http:
           method: DELETE
           path: /bank/{id}
+          authorizer: authorize
+          cors: true
+
+  createAccount:
+    handler: functions/account/createInternet.handler
+    events:
+      - http:
+          method: POST
+          path: /account/internet
+          authorizer: authorize
+          cors: true
+  createAccountManager:
+    handler: functions/account/createManager.handler
+    events:
+      - http:
+          method: POST
+          path: /account/manager
           authorizer: authorize
           cors: true
 

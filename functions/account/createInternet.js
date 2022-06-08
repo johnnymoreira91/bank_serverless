@@ -30,7 +30,8 @@ exports.handler = async (event, context, callback) => {
         typeAccount: body.typeAccount,
         active: body.active,
         agency_number: body.agency_number,
-        account_number: body.agencyId + new Date().getTime() + 1
+        account_number: body.agency_number + new Date().getTime() + 1,
+        user_id: body.user_id
       }
     })
 
@@ -46,7 +47,7 @@ exports.handler = async (event, context, callback) => {
       body: JSON.stringify({
         error: {
           requiredFields: {
-            agencyId: true
+            agency_number: true
           }
         }
       })

@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
+const authorizer = require('../authorization')
 
 /**
  * @function
@@ -8,9 +9,15 @@ const prisma = new PrismaClient()
 exports.handler = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
-  const body = JSON.parse(event.body)
   const id = event.pathParameters.id
   try {
+    const permission = await authorizer(event, 2)
+    if (permission === false) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify('User doenst have permission')
+      }
+    }
     const bankBranch = await prisma.bankBranch.findFirst({
       where: { agencyId: id }
     })

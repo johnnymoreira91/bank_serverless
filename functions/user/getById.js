@@ -9,6 +9,7 @@ const cache = require('../cache')
  */
 exports.handler = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
+  const id = event.pathParameters.id
   try {
     // await cache.connect()
     const permission = await authorizer(event, 0)
@@ -18,10 +19,16 @@ exports.handler = async (event, context, callback) => {
         body: JSON.stringify('User doenst have permission')
       }
     }
-    const client = await cache.get('listUsers')
+    const client = await cache.get(`user:${id}`)
     if (!client) {
-      const users = await prisma.user.findMany()
-      await cache.set('listUsers', JSON.stringify(users), {
+      const users = await prisma.user.findFirst({
+          where: {userId: id},
+          include: {
+              Account: true,
+              CreditCard: true
+          }
+      })
+      await cache.set(`user:${id}`, JSON.stringify(users), {
         EX: 30
       })
       return {

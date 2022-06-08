@@ -42,7 +42,7 @@ exports.handler = async (event, context, callback) => {
         limit_acount_money: body.limit_acount_money,
         active: body.active,
         agency_number: body.agency_number,
-        account_number: body.agencyId + new Date().getTime() + 1
+        account_number: body.agency_number + new Date().getTime() + 1
       }
     })
 
